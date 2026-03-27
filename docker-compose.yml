@@ -1,0 +1,73 @@
+###############################################
+# Common Keys
+###############################################
+x-common-keys: &common-keys
+  restart: unless-stopped
+
+services:
+
+###############################################
+# prometheus
+###############################################
+
+  prometheus:
+    <<: *common-keys
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+###############################################
+# grafana
+###############################################
+
+  grafana:
+    <<: *common-keys
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - ./grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+###############################################
+# node exporter
+###############################################
+
+  node-exporter:
+    <<: *common-keys
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    pid: host
+    network_mode: host
+
+###############################################
+# cadvisor
+###############################################
+
+  cadvisor:
+    <<: *common-keys
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+
+###############################################
+# uptime-kuma
+###############################################
+
+  uptime-kuma:
+    <<: *common-keys
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    volumes:
+      - ./uptime-kuma:/app/data
+    ports:
+      - "3001:3001"
